@@ -1,0 +1,30 @@
+# Ce qui n'entre jamais dans le contexte de construction de l'image.
+# (Le .git du thème est exclu : les sous-modules sont copiés comme de simples fichiers.)
+.git
+.github
+.gitignore
+.gitmodules
+.env
+.env.*
+!.env.example
+data/
+doc/
+*.docx
+*.md
+
+# artefacts locaux : régénérés dans l'image
+node_modules/
+static/src/node_modules/
+static/.webassets-cache/
+static/js/gen/
+static/css/gen/
+static/js/app.js
+static/js/app.js.map
+static/css/app.css
+static/css/app.css.map
+coverage/
+**/.DS_Store
+*.swp
+*.un~
+*.sublime-*
+*.idea/

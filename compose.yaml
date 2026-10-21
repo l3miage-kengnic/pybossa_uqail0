@@ -1,0 +1,132 @@
+# Composition PyBossa pour U-QUAIL.
+#
+#   docker compose --profile local up -d     # poste de travail (ajoute Mailpit, faux serveur de courriel)
+#   docker compose up -d                     # VM (production)
+#
+# Six services : db (PostgreSQL), redis, web (Flask/gunicorn), worker (RQ),
+# scheduler (RQ scheduler), proxy (Caddy, HTTPS). Les trois services PyBossa
+# partagent la même image et la même configuration (bloc x-pybossa).
+# Toutes les valeurs ${...} viennent de .env (copié depuis .env.example).
+
+name: uquail
+
+x-pybossa: &pybossa
+  image: pybossa:dev
+  build:
+    context: .
+    args:
+      PYBOSSA_REF: ${PYBOSSA_REF}
+  env_file: .env
+  environment:
+    # lue par alembic/env.py du serveur (migrations de schéma)
+    PYB_SQLALCHEMY_DATABASE_URI: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db/${POSTGRES_DB}
+    POSTGRES_HOST: db
+    REDIS_HOST: redis
+    REDIS_PORT: "6379"
+  volumes:
+    - ./deploy/settings_local.py:/config/settings_local.py:ro
+    - uploads:/app/uploads
+  depends_on:
+    db:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+  restart: unless-stopped
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      TZ: ${TZ:-Europe/Paris}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    restart: unless-stopped
+
+  web:
+    <<: *pybossa
+    command:
+      - gunicorn
+      - --bind=0.0.0.0:5000
+      - --workers=${WEB_WORKERS:-2}
+      - --threads=2
+      - --timeout=120
+      - --forwarded-allow-ips=*
+      - --access-logfile=-
+      - pybossa.run:app
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost:5000/"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
+  worker:
+    <<: *pybossa
+    # Files RQ écoutées (noms vérifiés dans pybossa/core.py et pybossa/jobs.py).
+    # Sans ce service, l'application tourne mais aucun export ni courriel n'aboutit.
+    command:
+      - python
+      - app_context_rqworker.py
+      - scheduled_jobs
+      - super
+      - high
+      - medium
+      - low
+      - email
+      - maintenance
+
+  scheduler:
+    <<: *pybossa
+    # Programme les travaux périodiques (statistiques, nettoyages).
+    command: ["python", "run_scheduler.py"]
+
+  proxy:
+    image: caddy:2
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:-localhost}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data        # certificats TLS (à conserver)
+      - caddy_config:/config
+    depends_on:
+      - web
+    restart: unless-stopped
+
+  # Faux serveur de courriel, uniquement sur le poste : les e-mails envoyés par
+  # PyBossa se lisent sur http://localhost:8025 au lieu de partir pour de vrai.
+  mailpit:
+    image: axllent/mailpit:v1.21
+    profiles: ["local"]
+    ports:
+      - "8025:8025"
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  redisdata:
+  uploads:
+  caddy_data:
+  caddy_config:

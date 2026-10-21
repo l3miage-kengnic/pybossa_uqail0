@@ -1,0 +1,23 @@
+# Proxy inverse Caddy : termine le HTTPS et transmet au service "web" (gunicorn:5000).
+#
+# DOMAIN vient de .env (via compose.yaml) :
+#   - DOMAIN=localhost            : Caddy émet un certificat auto-signé (avertissement
+#                                   du navigateur, normal sur le poste de travail) ;
+#   - DOMAIN=uquail.univ-....fr   : Caddy obtient et renouvelle seul un certificat
+#                                   Let's Encrypt. Le port 80 doit être ouvert pour cela.
+
+{$DOMAIN} {
+	encode gzip
+
+	# Décision en attente (plan, §7, point 3) : fermer l'inscription libre.
+	# Décommenter pour renvoyer 403 sur la page d'inscription une fois les comptes créés.
+	# @register path /account/register /account/register/*
+	# respond @register 403
+
+	reverse_proxy web:5000
+
+	log {
+		output stdout
+		format console
+	}
+}
