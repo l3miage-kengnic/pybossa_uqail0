@@ -52,7 +52,7 @@
         <h3> Publish Project </h3>
         <strong>{{ _('Publish project on ') }} {{ server_type }}</strong>
         <p>
-            {{ _('You are about to publish your project in ') }} {{server_type}} {{_(' Gigwork environment. Once your project is published, it can be tested by other users with ')}} {{server_type}} {{ _(' GIGwork accounts.') }}
+            {{ _('You are about to publish your project in ') }} {{server_type}} {{_(' environment. Once your project is published, it can be tested by other users with ')}} {{server_type}} {{ _(' accounts.') }}
             {{ _('This action will not push your project to the production environment. To do this, please use the Sync Project to Production tab so that your workforce can access it.')}}</p>
         <form class="form-horizontal" method="post" action="{{ url_for('project.publish', short_name = project.short_name) }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
@@ -74,7 +74,7 @@
             <p>{{  _('  If your project is already on production, please ensure that the ‘Enable Project Syncing’ setting is checked on the Production job.') }}
                     {{ _('  Then get your API key from production as follow: ') }}&nbsp;
                     <b>
-                        <a href="{{ target_url }}" target="_blank">Production GIGwork</a>
+                        <a href="{{ target_url }}" target="_blank">Production {{brand}}</a>
                         {{  _(' > My Profile > API Key ') }}
                     </b>
             </p>

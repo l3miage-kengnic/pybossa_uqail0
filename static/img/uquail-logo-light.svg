@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- U-QUAIL : logo pour fond clair (documents, page d'accueil). Icône violet AI4Health #9800F9, mot en violet sombre. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="236" height="60" viewBox="0 0 236 60" role="img" aria-label="U-QUAIL">
+  <g transform="translate(2,3) scale(0.5)">
+    <path d="M22 46 L 22 62 L 2 34 Z" fill="#9800F9" stroke="#9800F9" stroke-width="5" stroke-linejoin="round"/>
+    <path d="M24 44 V 60 a 27 27 0 0 0 54 0 V 36 L 86 26" fill="none" stroke="#9800F9" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="90" cy="20" r="9" fill="#9800F9"/>
+    <path d="M98 17 L 108 20 L 98 23 Z" fill="#9800F9" stroke="#9800F9" stroke-width="2.5" stroke-linejoin="round"/>
+    <circle cx="93" cy="18" r="2.2" fill="#ffffff"/>
+    <polyline points="24,44 40,30 58,26 78,36" fill="none" stroke="#5B0098" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="24" cy="44" r="5" fill="#ffffff" stroke="#9800F9" stroke-width="3"/>
+    <circle cx="40" cy="30" r="5" fill="#ffffff" stroke="#9800F9" stroke-width="3"/>
+    <circle cx="58" cy="26" r="5" fill="#ffffff" stroke="#9800F9" stroke-width="3"/>
+    <circle cx="78" cy="36" r="5" fill="#ffffff" stroke="#9800F9" stroke-width="3"/>
+  </g>
+  <text x="68" y="39" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="27" font-weight="600" letter-spacing="1" fill="#5B0098">U-QUAIL</text>
+</svg>

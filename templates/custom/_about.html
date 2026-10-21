@@ -1,0 +1,35 @@
+{# U-QUAIL : page "À propos". Point d'extension prévu par le thème (home/about.html inclut
+   custom/_about.html avant home/_about.html). Aucun fichier existant modifié. #}
+<section class="uq-about">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-offset-2 col-md-8">
+                <br/>
+                <h1>{{ _('About') }} {{ brand }}</h1>
+                <p class="lead">{{ _('%(brand)s stands for User Quality Assessment of Intelligent Logic. It is an annotation platform where domain experts judge the answers, and the reasoning behind them, that AI systems produce from biomedical knowledge graphs.', brand=brand) }}</p>
+
+                <h2>{{ _('Why') }}</h2>
+                <p>{{ _('Knowledge-graph question answering systems can return a plausible answer together with a chain of facts that supposedly justifies it. Whether that chain is correct, relevant and well sourced cannot be judged by machines alone. %(brand)s collects structured expert judgements on these answers so that systems can be compared and improved on solid ground.', brand=brand) }}</p>
+
+                <h2>{{ _('How a campaign works') }}</h2>
+                <ul>
+                    <li>{{ _('The research team selects question/answer items and defines a campaign: how many experts judge each item, which items are shared by everyone, and how many control items are inserted.') }}</li>
+                    <li>{{ _('Each invited annotator receives a personal queue. The model that produced an answer is never shown: judgements are blind.') }}</li>
+                    <li>{{ _('For every item the annotator scores the reasoning, the sources and the final result, and can leave a comment. Start and end times and the interface version are recorded.') }}</li>
+                    <li>{{ _('Judgements are collected by the research team, checked against control items, and analysed for inter-annotator agreement. Campaign plans are generated from a fixed seed and can be replayed identically.') }}</li>
+                </ul>
+
+                <h2>{{ _('Who') }}</h2>
+                <p>{{ _('%(brand)s is operated by the AI4Health@DAISY team of the Laboratoire d\'Informatique de Grenoble (LIG), Université Grenoble Alpes, and is hosted on the GRICAD research infrastructure in Grenoble, France. Annotators take part by invitation only.', brand=brand) }}</p>
+
+                <h2>{{ _('Software and licence') }}</h2>
+                <p>{{ _('%(brand)s runs on PyBossa, a free crowdsourcing framework published under the GNU Affero General Public License v3, in the version maintained by Bloomberg. The PyBossa server is used without modification; the theme and deployment files of this instance are public.', brand=brand) }}
+                {% if config.PROJECT_URL %}<a href="{{ config.PROJECT_URL }}">{{ _('Source code of this instance') }}</a>.{% endif %}</p>
+
+                <h2>{{ _('Contact') }}</h2>
+                <p>{% if config.CONTACT_EMAIL %}<a href="mailto:{{ config.CONTACT_EMAIL }}">{{ config.CONTACT_EMAIL }}</a>{% else %}{{ _('See the project website of the AI4Health@DAISY team.') }}{% endif %}</p>
+                <br/>
+            </div>
+        </div>
+    </div>
+</section>

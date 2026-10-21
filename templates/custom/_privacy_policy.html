@@ -1,0 +1,39 @@
+{# U-QUAIL : politique de confidentialité (RGPD). Point d'extension prévu par le thème
+   (help/privacy.html inclut custom/_privacy_policy.html avant help/_privacy_policy.html).
+   PROJET DE TEXTE : les mentions entre crochets sont à compléter et l'ensemble est à faire
+   valider par le délégué à la protection des données (DPO) de l'UGA avant la première campagne. #}
+<section class="help privacy">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-offset-2 col-md-8" style="margin-top: 50px;">
+                <h1>{{ _('Privacy policy') }}</h1>
+                <p class="text-muted"><em>{{ _('Draft: to be validated by the data protection officer before the first real campaign.') }}</em></p>
+
+                <h2>{{ _('Who is responsible') }}</h2>
+                <p>{{ _('%(brand)s is operated by the Laboratoire d\'Informatique de Grenoble (LIG), Université Grenoble Alpes, for the research project U-QUAIL. The data controller is Université Grenoble Alpes. Contact for this platform:', brand=brand) }}
+                {% if config.CONTACT_EMAIL %}<a href="mailto:{{ config.CONTACT_EMAIL }}">{{ config.CONTACT_EMAIL }}</a>{% else %}[{{ _('contact address to be completed') }}]{% endif %}.
+                {{ _('Data protection officer:') }} [{{ _('DPO contact of Université Grenoble Alpes, to be completed') }}].</p>
+
+                <h2>{{ _('What data is processed, and why') }}</h2>
+                <ul>
+                    <li>{{ _('Account data: name, user name, e-mail address, hashed password. Purpose: give invited annotators access to the platform and contact them about campaigns. Legal basis: performance of the research collaboration you agreed to take part in.') }}</li>
+                    <li>{{ _('Annotation data: your judgements (scores, comments), the time you started and submitted each item, and the version of the annotation interface. Purpose: scientific evaluation of AI systems and analysis of agreement between experts. Legal basis: public-interest research carried out by a public university.') }}</li>
+                    <li>{{ _('Technical data: server logs with anonymised IP addresses, needed to run and secure the service. Legal basis: legitimate interest in the security of the platform.') }}</li>
+                </ul>
+                <p>{{ _('No special categories of personal data are processed. The items you judge contain no patient data: they are built from public biomedical knowledge graphs.') }}</p>
+
+                <h2>{{ _('Who can see your data') }}</h2>
+                <p>{{ _('Your judgements are visible only to you and to the research team. Other annotators cannot see them. In publications and shared datasets, judgements are attributed to a stable pseudonym, never to your name. No data is sold or transferred to third parties, and no data leaves the European Union: the platform is hosted on the GRICAD research infrastructure in Grenoble, France.') }}</p>
+
+                <h2>{{ _('How long data is kept') }}</h2>
+                <p>{{ _('Account data is kept for the duration of the project and deleted at most [12 months] after the last campaign you took part in, unless you ask for deletion earlier. Pseudonymised annotation data is kept as research data, in accordance with the university\'s research data policy, so that published results remain verifiable.') }}</p>
+
+                <h2>{{ _('Your rights') }}</h2>
+                <p>{{ _('You can ask to access, correct or delete your account data, to restrict or object to its processing, and to receive a copy of it. Write to the contact address above; the data protection officer, then the CNIL (French supervisory authority), can be contacted if you believe your rights are not respected. Deleting your account does not delete pseudonymised judgements already included in an analysis.') }}</p>
+
+                <h2>{{ _('Cookies') }}</h2>
+                <p>{{ _('This site only uses cookies that are strictly necessary. See the') }} <a href="{{ url_for('help.cookies_policy') }}">{{ _('cookies page') }}</a>.</p>
+            </div>
+        </div>
+    </div>
+</section>

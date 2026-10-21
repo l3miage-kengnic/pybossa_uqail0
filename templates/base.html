@@ -3,25 +3,23 @@
   <head>
     <meta charset="utf-8">
     {% if brand == title %}
-    <title>{{ title }} - PyBossa by Scifabric</title>
+    <title>{{ title }}</title>
     {% else %}
-    <title>{{ brand }} &middot; {{ title }} - PyBossa by Scifabric</title>
+    <title>{{ brand }} &middot; {{ title }}</title>
     {% endif %}
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="PYBOSSA is the ultimate crowdsourcing framework to analyze or enrich data that can't be processed by machines alone.">
-    <meta name="author" content="Scifabric">
+    <meta name="description" content="{{ config.get('DESCRIPTION', '') }}">
+    <meta name="author" content="{{ config.get('COPYRIGHT', '') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- Le styles -->
     {% assets "css_pybossa" %}
         <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
     {% endassets %}
+    <!-- U-QUAIL : habillage (surcharges uniquement), chargé après le bundle du thème -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/uquail.css') }}">
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
-    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
-    <!--[if lt IE 9]>
-      <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/font-awesome-4.5.0/css/font-awesome.min.css') }}">
 
     <!-- Le fav and touch icons -->
     <link rel="apple-touch-icon" sizes="57x57" href="{{ url_for('static', filename='img/favicon/apple-icon-57x57.png') }}">
@@ -79,11 +77,29 @@
     <!-- checkpoint::logged-in::{{current_user.name}} -->
     {% endif %}
     {% block content %}{% endblock %}
-    <!-- Le javascript -->
-    <script id="cookies_warning">
-        window.cookieconsent_options = {"message":"Cookies help us to deliver our services. By using our services, you agree to our use of cookies.","dismiss":"Got it!","learnMore":"Learn More.","link":"{{url_for('help.cookies_policy')}}","theme":"dark-bottom"};
+    <!-- U-QUAIL : bannière d'information sur les cookies. Première partie, aucun script tiers.
+         Le site ne pose que des cookies strictement nécessaires (session, "se souvenir de moi",
+         préférence d'affichage) : pas de consentement à recueillir, seulement une information.
+         La fermeture est mémorisée dans le navigateur (localStorage), sans cookie supplémentaire. -->
+    <div id="uq-cookie-notice" class="uq-cookie-notice" role="region" aria-label="{{ _('Cookie information') }}" hidden>
+        <p>{{ _('This site only uses cookies that are strictly necessary to sign you in and keep the service secure. No third-party, advertising or analytics cookies are set.') }}
+           <a href="{{ url_for('help.cookies_policy') }}">{{ _('Learn more') }}</a></p>
+        <button type="button" id="uq-cookie-notice-close" class="btn btn-uq-accent">{{ _('OK') }}</button>
+    </div>
+    <script>
+      (function () {
+        var key = 'uq_cookie_notice_seen', box = document.getElementById('uq-cookie-notice');
+        if (!box) return;
+        var seen = false;
+        try { seen = window.localStorage.getItem(key) === '1'; } catch (e) {}
+        if (seen) return;
+        box.removeAttribute('hidden');
+        document.getElementById('uq-cookie-notice-close').addEventListener('click', function () {
+          try { window.localStorage.setItem(key, '1'); } catch (e) {}
+          box.setAttribute('hidden', '');
+        });
+      }());
     </script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/cookieconsent2/1.0.9/cookieconsent.min.js"></script>
     {% block extrajs %}
     {% endblock %}
     {% include "_flash_messages.html" %}

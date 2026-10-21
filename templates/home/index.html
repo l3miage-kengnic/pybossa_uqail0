@@ -2,12 +2,23 @@
 {% import "projects/_helpers.html" as helper %}
 {% import "account/_helpers.html" as account_helper %}
 {% block content %}
+{# U-QUAIL : page d'accueil. Textes en anglais dans _() pour rester traduisibles (translations/). #}
 <section class="home featured">
     <div class="jumbotron">
         <div class="container text-center firstfold">
-            <h1>{{_('Welcome to ')}} {{brand}}</h1>
-            <p>{{brand}} {{_("is a crowdsourcing platform that helps you leverage the power of dynamic groups of people (crowds) to create and augment datasets faster and more accurately than is possible using automated methods alone.")}}</p>
-          </div>
+            <span class="uq-eyebrow">{{ _('User Quality Assessment of Intelligent Logic') }}</span>
+            <h1>{{ _('Expert review of AI reasoning') }}</h1>
+            <p>{{ _('%(brand)s lets domain experts judge the answers and reasoning paths that AI systems produce over biomedical knowledge graphs. Every judgement is blind, time-stamped and traceable, so that campaigns can be analysed and published.', brand=brand) }}</p>
+            <div class="uq-hero-actions">
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('project.index') }}" class="btn btn-uq-accent btn-lg">{{ _('My annotation projects') }}</a>
+                <a href="{{ url_for('home.about') }}" class="btn btn-info btn-lg">{{ _('How it works') }}</a>
+                {% else %}
+                <a href="{{ url_for('account.signin') }}" class="btn btn-uq-accent btn-lg">{{ _('Sign in') }}</a>
+                <a href="{{ url_for('home.about') }}" class="btn btn-info btn-lg">{{ _('How it works') }}</a>
+                {% endif %}
+            </div>
+        </div>
     </div>
 </section>
 {% if current_user.is_authenticated %}
@@ -17,52 +28,51 @@
 {% if featured %}
 {{ helper.render_grid_projects(featured, 'Featured Projects', upload_method, current_user, section_class='home projects', readmore_text='Contribute', title_size='2') }}
 {% endif %}
+{% if current_user.admin %}
 <section class="grey get-started">
     <div class="row text-center">
         <div>
-            <h2><i class="icon-play-circle"></i> {{ _('Get Started!') }}</h2>
-            <p>{{ _('It\'s really simple to start using GIGwork') }}</p>
+            <h2>{{ _('Administration') }}</h2>
+            <p>{{ _('Create a campaign project, or invite a new annotator.') }}</p>
         </div>
         <div>
-            <a href="{{url_for('project.index')}}" class="btn btn-info btn-large"><i class="icon-ok-sign"></i>{{ _(' Start Contributing') }}</a>
-            {% if current_user.admin %}
             <a href="{{url_for('project.new')}}" class="btn btn-primary btn-large"><i class="icon-plus-sign"></i> {{ _('Create a Project') }}</a>
-            <a href="{{ url_for('account.register') }}" class="btn btn-success btn-large"><i class="icon icon-white icon-user"></i>{{ _(' Create a new account!') }}</a></br>
-            {% endif %}
+            <a href="{{ url_for('account.register') }}" class="btn btn-success btn-large"><i class="icon icon-white icon-user"></i>{{ _(' Create a new account!') }}</a>
         </div>
     </div>
     <br/>
     <br/>
 </section>
 {% endif %}
-<section class="about">
-    <div>
-        <div class="container text-left firstfold">
-            <div class="row">
-             <div class="col-md-12">
-                <p style="text-align:center; margin-left: 130px; margin-right: 130px">{{brand}} {{ _('is a crowdsourcing platform based on <a href="https://pybossa.com">Pybossa</a>, an open source crowdsourcing platform developed by <a href="https://scifabric.com">Scifabric.</a>  GIGwork makes it easy to host, run, monitor and review/analyze quality for annotation projects. This makes it possible to quickly create new datasets with information that requires human cognition, knowledge, or intelligence to complete — such as text annotation, language translation, data collection/capture, and more!') }}</p>
-                <p style="text-align:center"><a href="{{ url_for('home.about') }}">{{ _('Read more about GIGwork') }}</a></p>
+{% endif %}
+<section class="uq-cards">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="uq-card">
+                    <h3>{{ _('Blind, traceable judgements') }}</h3>
+                    <p>{{ _('Experts never see which model produced an answer. Each judgement records its scores, timing and the exact interface version, so results can be audited and reproduced.') }}</p>
+                </div>
             </div>
+            <div class="col-md-4">
+                <div class="uq-card uq-card-accent">
+                    <h3>{{ _('Built for experts, not crowds') }}</h3>
+                    <p>{{ _('Annotators are invited by the research team. Each receives a personal queue of items, with shared items for agreement analysis and control items for quality.') }}</p>
+                </div>
             </div>
-          </br>
-            <div class="row">
-              <div class="col-md-offset-3 col-md-3 text-center pagination-centered">
-                <p><img src="{{ url_for('static', filename='img/unlocked.svg') }}" height="120"></p>
-              </div>
-              <div class="col-md-3 text-center pagination-centered">
-                <p><img src="{{ url_for('static', filename='img/wink.svg') }}" height="120"></p>
-              </div>
-            </div>
-            <br />
-            <div class="row">
-              <div class="col-md-offset-3 col-md-3 text-center">
-                <p class="">{{ _('Unlocks the power<br />of global freelancers') }}</p>
-              </div>
-              <div class="col-md-3 text-center">
-                <p class="">{{ _('Things computers<br />can\'t do') }}</p>
-              </div>
+            <div class="col-md-4">
+                <div class="uq-card uq-card-lime">
+                    <h3>{{ _('Open and reproducible') }}</h3>
+                    <p>{{ _('%(brand)s runs on PyBossa, free software under the AGPL. Assignment plans are seeded and replayable, and the source of this instance is public.', brand=brand) }}</p>
+                </div>
             </div>
         </div>
+    </div>
+</section>
+<section class="uq-about">
+    <div class="container text-center">
+        <p>{{ _('%(brand)s is run by the AI4Health@DAISY team of the Laboratoire d\'Informatique de Grenoble (Université Grenoble Alpes), to evaluate the quality of answers produced by AI systems over biomedical knowledge graphs.', brand=brand) }}</p>
+        <p><a href="{{ url_for('home.about') }}">{{ _('Read more about %(brand)s', brand=brand) }}</a></p>
     </div>
 </section>
 {% endblock %}

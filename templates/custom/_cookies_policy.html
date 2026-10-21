@@ -1,0 +1,52 @@
+{# U-QUAIL : page "Cookies". Point d'extension prévu par le thème (help/cookies_policy.html
+   inclut custom/_cookies_policy.html avant help/_cookies_policy.html). #}
+<section class="help cookies">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-offset-2 col-md-8" style="margin-top: 50px;">
+                <h1>{{ _('How %(brand)s uses cookies', brand=brand) }}</h1>
+
+                <p>{{ _('%(brand)s only uses cookies that are strictly necessary to operate the service. It sets no third-party cookies, embeds no advertising, analytics or social-network widgets, and loads no script from a tracking service. Because none of these cookies requires consent under the ePrivacy Directive and the GDPR, no consent banner is displayed: this page is here to inform you.', brand=brand) }}</p>
+
+                <h2>{{ _('Cookies set by this site') }}</h2>
+                <table class="table table-condensed">
+                    <thead>
+                        <tr><th>{{ _('Name') }}</th><th>{{ _('Purpose') }}</th><th>{{ _('Lifetime') }}</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>session</code></td>
+                            <td>{{ _('Keeps you signed in during a visit and protects forms against cross-site request forgery. Contains no personal data in clear text.') }}</td>
+                            <td>{{ _('12 hours, or until you sign out') }}</td>
+                        </tr>
+                        <tr>
+                            <td><code>uquail_remember_token</code></td>
+                            <td>{{ _('Only if you tick "remember me" when signing in: keeps you signed in between visits.') }}</td>
+                            <td>{{ _('Until you sign out') }}</td>
+                        </tr>
+                        <tr>
+                            <td><code>leftNavCollapse</code></td>
+                            <td>{{ _('Remembers whether you collapsed the side menu of a project. Display preference only.') }}</td>
+                            <td>{{ _('1 year') }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p>{{ _('The information banner shown on your first visit does not set a cookie: the fact that you closed it is stored in your browser\'s local storage, under the name') }} <code>uq_cookie_notice_seen</code>.</p>
+
+                <h2>{{ _('What this site does not do') }}</h2>
+                <ul>
+                    <li>{{ _('No audience measurement (no Google Analytics or similar).') }}</li>
+                    <li>{{ _('No advertising or marketing cookies.') }}</li>
+                    <li>{{ _('No social-network buttons or embedded videos that could set their own cookies.') }}</li>
+                    <li>{{ _('No sign-in through third-party accounts.') }}</li>
+                </ul>
+
+                <h2>{{ _('Managing cookies') }}</h2>
+                <p>{{ _('You can delete or block cookies in your browser settings. If you block the session cookie, you will not be able to sign in.') }}</p>
+
+                <p>{{ _('Questions about personal data are covered by our') }} <a href="{{ url_for('help.privacy') }}">{{ _('privacy policy') }}</a>.</p>
+            </div>
+        </div>
+    </div>
+</section>

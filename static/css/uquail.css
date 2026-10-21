@@ -1,0 +1,214 @@
+/*
+ * U-QUAIL — habillage du thème PyBossa.
+ * Chargé après le bundle CSS du thème (voir templates/base.html) : ce fichier ne fait
+ * que surcharger, il ne remplace aucune feuille existante.
+ *
+ * Palette (couleurs extraites des logos, aucun logo repris) :
+ *   - violet AI4Health@DAISY  #9800f9  : identité, liens, bouton principal
+ *   - bleu nuit UGA           #2b2e46  : texte, barre de navigation, pied de page
+ *   - orange UGA              #e74e0e  : accent (version foncée #c43f05 pour les boutons, contraste 4.5:1)
+ *   - bleu LIG                #197cc0  : informations, boutons secondaires
+ *   - gris ardoise (site AI4Health) #f8fafc / #e2e8f0 / #cbd5e1 : fonds et bordures
+ * Direction : minimalisme, fort contraste, mouvements discrets (skill ui-ux-pro-max, style "Swiss").
+ */
+
+:root {
+  --uq-violet: #9800f9;
+  --uq-violet-dark: #6a00b0;
+  --uq-violet-soft: #f1e4ff;
+  --uq-navy: #2b2e46;
+  --uq-navy-soft: #4b4e66;
+  --uq-orange: #e74e0e;
+  --uq-orange-dark: #c43f05;
+  --uq-orange-soft: #fdebe2;
+  --uq-blue: #197cc0;
+  --uq-blue-dark: #145f94;
+  --uq-bg: #f8fafc;
+  --uq-surface: #ffffff;
+  --uq-muted: #e2e8f0;
+  --uq-border: #cbd5e1;
+  --uq-radius: 8px;
+  --uq-transition: 200ms ease;
+}
+
+/* ---------- Base ---------- */
+body {
+  background: var(--uq-bg);
+  color: var(--uq-navy);
+}
+a { color: var(--uq-violet-dark); transition: color var(--uq-transition); }
+a:hover, a:focus { color: var(--uq-violet); }
+h1, h2, h3, h4 { color: var(--uq-navy); }
+
+/* Focus visible au clavier, partout. */
+a:focus-visible, button:focus-visible, .btn:focus-visible, input:focus-visible,
+select:focus-visible, textarea:focus-visible {
+  outline: 3px solid var(--uq-blue);
+  outline-offset: 2px;
+}
+
+/* ---------- Barre de navigation ---------- */
+.navbar-inner, .navbar-fixed-top .navbar-inner { background: var(--uq-navy); }
+.navbar-brand { height: auto; padding: 14px 15px; }
+.navbar-brand > img,
+.blpstrap3 .navbar-brand > img {
+  max-width: none;
+  width: auto;
+  height: 68px;
+  margin-top: 0;
+}
+.navbar-inner .navbar-nav > li > a { color: #fff; transition: color var(--uq-transition); }
+article .navbar-inner a:hover,
+article .navbar-inner a:active { color: #ffb48a !important; }
+
+/* ---------- Bandeau d'accueil ---------- */
+section.home .jumbotron,
+section.home.featured .jumbotron,
+.jumbotron {
+  background: var(--uq-surface);
+  color: var(--uq-navy);
+  padding: 56px 15px 48px;
+  border-bottom: 1px solid var(--uq-muted);
+}
+.jumbotron h1 {
+  color: var(--uq-navy);
+  font-size: 44px;
+  font-weight: 700;
+  margin: 12px 0 18px;
+  letter-spacing: -0.01em;
+}
+.jumbotron p {
+  color: var(--uq-navy-soft);
+  font-size: 20px;
+  line-height: 1.5;
+  max-width: 760px;
+  margin: 0 auto;
+}
+.uq-eyebrow {
+  display: inline-block;
+  color: var(--uq-violet-dark);
+  background: var(--uq-violet-soft);
+  border-radius: 999px;
+  padding: 4px 14px;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.uq-hero-actions { margin-top: 28px; }
+.uq-hero-actions .btn { margin: 6px 8px; min-height: 44px; }
+
+/* ---------- Boutons ---------- */
+.btn {
+  border-radius: var(--uq-radius);
+  cursor: pointer;
+  transition: background-color var(--uq-transition), border-color var(--uq-transition), color var(--uq-transition);
+}
+.btn-primary, .btn-primary:focus {
+  background: var(--uq-violet);
+  border-color: var(--uq-violet-dark);
+  color: #fff;
+}
+.btn-primary:hover, .btn-primary:active {
+  background: var(--uq-violet-dark);
+  border-color: var(--uq-violet-dark);
+  color: #fff;
+}
+.btn-info, .btn-info:focus {
+  background: var(--uq-blue);
+  border-color: var(--uq-blue-dark);
+  color: #fff;
+}
+.btn-info:hover, .btn-info:active { background: var(--uq-blue-dark); border-color: var(--uq-blue-dark); color: #fff; }
+.btn-uq-accent, .btn-uq-accent:focus {
+  background: var(--uq-orange-dark);
+  border-color: var(--uq-orange-dark);
+  color: #fff;
+}
+.btn-uq-accent:hover, .btn-uq-accent:active {
+  background: #a63404;
+  border-color: #a63404;
+  color: #fff;
+}
+
+/* ---------- Cartes de présentation ---------- */
+.uq-cards { padding: 48px 0 24px; }
+.uq-card {
+  background: var(--uq-surface);
+  border: 1px solid var(--uq-border);
+  border-top: 4px solid var(--uq-violet);
+  border-radius: var(--uq-radius);
+  padding: 24px 22px;
+  margin-bottom: 24px;
+  min-height: 190px;
+  text-align: left;
+}
+.uq-card h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--uq-navy);
+  margin: 0 0 10px;
+}
+.uq-card p { color: var(--uq-navy-soft); font-size: 15px; line-height: 1.55; margin: 0; }
+.uq-card.uq-card-accent { border-top-color: var(--uq-orange); }
+.uq-card.uq-card-lime { border-top-color: var(--uq-blue); }
+
+/* ---------- Sections ---------- */
+section.grey { background: var(--uq-muted); }
+section.grey:before, section.grey:after { display: none; }
+section.about, section.uq-about { background: transparent; padding: 32px 0 48px; }
+section.uq-about p { color: var(--uq-navy-soft); font-size: 17px; line-height: 1.6; max-width: 820px; margin: 0 auto 12px; }
+section.uq-about h1, section.uq-about h2 { margin-top: 28px; }
+section.uq-about ul { max-width: 820px; margin: 0 auto 12px; color: var(--uq-navy-soft); line-height: 1.6; }
+
+/* ---------- Pied de page ---------- */
+body > footer, body > footer .container-fluid.scifabric {
+  background: var(--uq-navy);
+  color: var(--uq-border);
+}
+body > footer a, body > footer li > a { color: #dcc6ff; transition: color var(--uq-transition); }
+body > footer a:hover, body > footer li > a:hover { color: #ffb48a; }
+body > footer p { color: var(--uq-border); }
+body > footer .decorator { display: none; }
+
+/* ---------- Formulaires et éléments actifs ---------- */
+.form-control:focus {
+  border-color: var(--uq-violet);
+  box-shadow: 0 0 0 3px rgba(152, 0, 249, 0.15);
+}
+.list-group-item.active, .list-group-item.active:hover {
+  background: var(--uq-violet);
+  border-color: var(--uq-violet-dark);
+}
+.pagination > .active > a { background: var(--uq-violet); border-color: var(--uq-violet-dark); }
+
+/* ---------- Bannière d'information sur les cookies (première partie, sans script tiers) ---------- */
+.uq-cookie-notice {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 1050;
+  background: var(--uq-navy);
+  color: #fff;
+  padding: 14px 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px 24px;
+  font-size: 15px;
+  line-height: 1.5;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.25);
+}
+.uq-cookie-notice p { margin: 0; max-width: 820px; }
+.uq-cookie-notice a { color: #dcc6ff; text-decoration: underline; }
+.uq-cookie-notice a:hover { color: #ffb48a; }
+.uq-cookie-notice .btn { min-height: 44px; padding: 8px 22px; }
+.uq-cookie-notice[hidden] { display: none; }
+
+/* Ancienne bannière tierce : plus chargée, au cas où un cache la rappelle. */
+.cc_banner-wrapper { display: none !important; }
+
+/* ---------- Respect de la préférence "réduire les animations" ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}

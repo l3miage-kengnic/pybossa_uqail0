@@ -4,6 +4,10 @@ templates/custom_footer.html
 templates/home/_other_projects.html
 templates/home/custom_text.html
 templates/custom/*
+# U-QUAIL : pages personnalisées via les points d'extension du thème (à versionner)
+!templates/custom/_about.html
+!templates/custom/_cookies_policy.html
+!templates/custom/_privacy_policy.html
 _gcs.html
 _gcs_form.html
 static/.webassets-cache/*
@@ -24,3 +28,5 @@ static/js/app.js.map
 data/
 doc/
 .env
+__pycache__/
+*.pyc
