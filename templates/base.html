@@ -77,6 +77,23 @@
     <!-- checkpoint::logged-in::{{current_user.name}} -->
     {% endif %}
     {% block content %}{% endblock %}
+    <!-- U-QUAIL : jeton anti-CSRF pour les appels d'API en session (envoi des jugements).
+         Le même script existe dans l'en-tête, mais les pages de task presenter chargent jQuery
+         après l'en-tête (jstop) : il n'y faisait rien. Rejoué ici, quand jQuery est disponible. -->
+    <script>
+      (function () {
+        var csrfToken = document.querySelector('meta[name="csrf-token"]');
+        if (!csrfToken || typeof $ === 'undefined' || window.__uqCsrfPrefilter) return;
+        window.__uqCsrfPrefilter = true;
+        $.ajaxPrefilter(function (options) {
+          var method = (options.type || 'GET').toUpperCase();
+          if (!options.crossDomain && !/^(GET|HEAD|OPTIONS|TRACE)$/.test(method)) {
+            options.headers = options.headers || {};
+            options.headers['X-CSRFToken'] = csrfToken.getAttribute('content');
+          }
+        });
+      }());
+    </script>
     <!-- U-QUAIL : bannière d'information sur les cookies. Première partie, aucun script tiers.
          Le site ne pose que des cookies strictement nécessaires (session, "se souvenir de moi",
          préférence d'affichage) : pas de consentement à recueillir, seulement une information.

@@ -13,6 +13,7 @@ d'environnement, elles-mêmes fournies par le fichier .env (jamais commité).
 de bloomberg/pybossa (ce dernier n'est pas du Python valide et contient des
 réglages propres à l'instance Bloomberg : il n'est pas repris tel quel).
 """
+import sys
 from collections import OrderedDict
 from os import environ
 
@@ -64,13 +65,21 @@ ITSDANGEROUSKEY = _required("ITSDANGEROUSKEY")
 CRYPTOPAN_KEY = _required("CRYPTOPAN_KEY")
 
 # Cookies : uniquement en HTTPS, inaccessibles au JavaScript.
-SESSION_COOKIE_SECURE = True
+# Exception : sur un poste de travail (DOMAIN=localhost), l'accès HTTP simple sur le port 8080
+# (tests, navigateur intégré des outils) doit pouvoir ouvrir une session ; on lève alors
+# l'obligation HTTPS. localhost n'est jamais un domaine de production.
+_LOCAL_WORKSTATION = _env("DOMAIN", "localhost") in ("localhost", "127.0.0.1")
+FORCE_HTTPS = not _LOCAL_WORKSTATION          # lu par flask-talisman (pybossa/core.py)
+SESSION_COOKIE_SECURE = not _LOCAL_WORKSTATION
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
-REMEMBER_COOKIE_SECURE = True
+REMEMBER_COOKIE_SECURE = not _LOCAL_WORKSTATION
 REMEMBER_COOKIE_HTTPONLY = True
 REMEMBER_COOKIE_NAME = "uquail_remember_token"
-PERMANENT_SESSION_LIFETIME = 12 * 60 * 60  # 12 h
+# Durée de session : 8 h glissantes, puis reconnexion. Un redémarrage du serveur ne
+# déconnecte personne (la session est un cookie signé, pas un état serveur) : c'est normal.
+PERMANENT_SESSION_LIFETIME = 8 * 60 * 60
+REMEMBER_COOKIE_DURATION = 7 * 24 * 60 * 60   # "se souvenir de moi" : 7 jours
 
 # ---------------------------------------------------------------------------
 # Base de données et Redis
@@ -92,7 +101,12 @@ REDIS_PORT = int(_env("REDIS_PORT", "6379"))
 REDIS_PWD = None
 REDIS_DB = 0
 REDIS_KEYPREFIX = "pybossa_cache"
-REDIS_SOCKET_TIMEOUT = 1.0   # 0.1 s par défaut, trop court en conteneur
+# Délai socket Redis. Pour le serveur web : court (0,1 s par défaut, trop juste en conteneur).
+# Pour le worker RQ : long, car il attend les travaux par une commande bloquante (BLPOP ~ 7 min)
+# et RQ ne relève pas un délai déjà configuré (rq/worker.py, _set_connection) : avec 1 s il
+# quitterait toutes les deux secondes avec "Redis connection timeout".
+_IS_RQ_WORKER = any("app_context_rqworker" in a for a in sys.argv[:1])
+REDIS_SOCKET_TIMEOUT = 900 if _IS_RQ_WORKER else 1.0
 REDIS_RETRY_ON_TIMEOUT = True
 REDIS_SSL = False
 
@@ -146,6 +160,16 @@ ENABLE_STRONG_PASSWORD = True
 SECURE_APP_ACCESS = False
 # Niveaux d'accès L1-L4 de Bloomberg : désactivés, inutiles ici.
 ENABLE_ACCESS_CONTROL = False
+# ... mais le fork exige une "classification des données" pour chaque projet
+# (pybossa/repositories/project_repository.py). Une seule classe, publique :
+# les items U-QUAIL viennent de graphes de connaissances publics, sans donnée patient.
+DATA_CLASSIFICATION = [("L4 - public", True)]
+VALID_DATA_CLASSES = [c for c, enabled in DATA_CLASSIFICATION if enabled]
+VALID_ACCESS_LEVELS = sorted({c.split("-")[0].strip() for c in VALID_DATA_CLASSES})
+# Catalogue produit/sous-produit du formulaire de création de projet (fonction Bloomberg).
+PRODUCTS_SUBPRODUCTS = {"U-QUAIL": ["Benchmark", "Sandbox"]}
+# Un mot de passe de projet n'est pas obligatoire (l'API le réclame quand même à la création).
+PROJECT_PASSWORD_REQUIRED = False
 # Chiffrement des données de tâche (fonction Bloomberg) : désactivé.
 ENABLE_ENCRYPTION = False
 # Pas d'outil de mesure d'audience tiers, pas de GCS/Mailchimp/Flickr/Dropbox.
@@ -154,9 +178,15 @@ ENABLE_ENCRYPTION = False
 # Courriel
 # En local (MAIL_SERVER vide) : Mailpit, le faux serveur du profil compose "local".
 # ---------------------------------------------------------------------------
-MAIL_SERVER = _env("MAIL_SERVER", "mailpit")
-MAIL_PORT = int(_env("MAIL_PORT", "587" if _env("MAIL_SERVER") else "1025"))
-MAIL_USE_TLS = _env_bool("MAIL_USE_TLS", bool(_env("MAIL_SERVER")))
+if _env("MAIL_SERVER"):
+    MAIL_SERVER = _env("MAIL_SERVER")
+    MAIL_PORT = int(_env("MAIL_PORT", "587"))
+    MAIL_USE_TLS = _env_bool("MAIL_USE_TLS", True)
+else:
+    # Poste de travail : Mailpit, port 1025, sans TLS, quoi que disent MAIL_PORT / MAIL_USE_TLS.
+    MAIL_SERVER = "mailpit"
+    MAIL_PORT = 1025
+    MAIL_USE_TLS = False
 MAIL_USERNAME = _env("MAIL_USERNAME")
 MAIL_PASSWORD = _env("MAIL_PASSWORD")
 MAIL_DEFAULT_SENDER = _env("MAIL_DEFAULT_SENDER", "U-QUAIL <no-reply@example.org>")

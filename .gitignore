@@ -30,3 +30,4 @@ doc/
 .env
 deploy/__pycache__/
 *.pyc
+backups/

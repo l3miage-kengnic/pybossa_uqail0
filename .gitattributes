@@ -1,0 +1,10 @@
+# Les scripts et fichiers destinés aux conteneurs Linux gardent des fins de ligne LF,
+# même sur un poste Windows (sinon "bad interpreter" ou erreurs de parsing dans l'image).
+*.sh       text eol=lf
+Makefile   text eol=lf
+Dockerfile text eol=lf
+Caddyfile  text eol=lf
+*.yaml     text eol=lf
+*.py       text eol=lf
+*.ini      text eol=lf
+*.svg      text eol=lf

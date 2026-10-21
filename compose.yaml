@@ -33,6 +33,10 @@ x-pybossa: &pybossa
     redis:
       condition: service_healthy
   restart: unless-stopped
+  security_opt: ["no-new-privileges:true"]
+  logging: &logging
+    driver: json-file
+    options: { max-size: "20m", max-file: "5" }
 
 services:
   db:
@@ -50,6 +54,8 @@ services:
       timeout: 3s
       retries: 12
     restart: unless-stopped
+    mem_limit: 512m
+    logging: *logging
 
   redis:
     image: redis:7-alpine
@@ -62,6 +68,8 @@ services:
       timeout: 3s
       retries: 12
     restart: unless-stopped
+    mem_limit: 256m
+    logging: *logging
 
   web:
     <<: *pybossa
@@ -80,6 +88,7 @@ services:
       timeout: 5s
       retries: 5
       start_period: 60s
+    mem_limit: 1g        # 2 processus gunicorn ≈ 600 Mo au repos (doc GRICAD §2)
 
   worker:
     <<: *pybossa
@@ -95,11 +104,13 @@ services:
       - low
       - email
       - maintenance
+    mem_limit: 768m
 
   scheduler:
     <<: *pybossa
     # Programme les travaux périodiques (statistiques, nettoyages).
     command: ["python", "run_scheduler.py"]
+    mem_limit: 256m
 
   proxy:
     image: caddy:2
@@ -116,6 +127,8 @@ services:
     depends_on:
       - web
     restart: unless-stopped
+    mem_limit: 128m
+    logging: *logging
 
   # Faux serveur de courriel, uniquement sur le poste : les e-mails envoyés par
   # PyBossa se lisent sur http://localhost:8025 au lieu de partir pour de vrai.

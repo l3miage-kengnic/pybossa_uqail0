@@ -51,11 +51,12 @@ select:focus-visible, textarea:focus-visible {
 .navbar-inner, .navbar-fixed-top .navbar-inner { background: var(--uq-navy); }
 .navbar-brand { height: auto; padding: 14px 15px; }
 .navbar-brand > img,
+.navbar .navbar-brand > img,
 .blpstrap3 .navbar-brand > img {
-  max-width: none;
+  max-width: none !important;   /* small-navbar.css (pages de projet) impose 70px et se charge après */
   width: auto;
   height: 68px;
-  margin-top: 0;
+  margin-top: 0 !important;
 }
 .navbar-inner .navbar-nav > li > a { color: #fff; transition: color var(--uq-transition); }
 article .navbar-inner a:hover,

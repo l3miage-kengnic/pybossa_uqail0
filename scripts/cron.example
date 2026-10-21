@@ -1,0 +1,7 @@
+# Sauvegarde quotidienne de l'instance U-QUAIL (tutoriel GRICAD §11).
+# À installer sur la VM, dans la crontab de l'utilisateur qui lance docker compose :
+#     crontab -e      puis coller la ligne ci-dessous (chemin à adapter)
+# Les variables BACKUP_* sont lues dans /opt/uquail/.env.
+#
+# m  h  dom mon dow  commande
+0  3  *   *   *    cd /opt/uquail && ./scripts/backup.sh >> /var/log/uquail-backup.log 2>&1

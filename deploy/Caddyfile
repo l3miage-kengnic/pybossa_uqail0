@@ -8,21 +8,18 @@
 
 # Accès HTTP simple, réservé au poste de travail (compose ne le publie que sur 127.0.0.1:8080).
 # Sert aux outils qui refusent le certificat auto-signé (tests automatisés, captures d'écran).
-# Les cookies de session étant marqués "Secure", la connexion n'y fonctionne pas : consultation seulement.
+# Connexion possible (DOMAIN=localhost lève l'obligation HTTPS) ; jamais exposé hors de la machine.
 http://localhost:8080 {
-	reverse_proxy web:5000 {
-		# PyBossa (flask-talisman) force le HTTPS : on lui fait croire que la requête l'est.
-		header_up X-Forwarded-Proto https
-	}
+	# Pas d'en-tête X-Forwarded-Proto forcé : deploy/settings_local.py lève l'obligation HTTPS
+	# quand DOMAIN=localhost, et annoncer "https" ferait échouer la protection CSRF des formulaires.
+	reverse_proxy web:5000
 }
 
 {$DOMAIN} {
 	encode gzip
 
-	# Décision en attente (plan, §7, point 3) : fermer l'inscription libre.
-	# Décommenter pour renvoyer 403 sur la page d'inscription une fois les comptes créés.
-	# @register path /account/register /account/register/*
-	# respond @register 403
+	# Inscription : réservée aux administrateurs par le serveur lui-même (fork Bloomberg),
+	# rien à bloquer ici.
 
 	reverse_proxy web:5000
 
