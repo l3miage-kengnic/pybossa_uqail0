@@ -25,6 +25,7 @@ x-pybossa: &pybossa
     REDIS_PORT: "6379"
   volumes:
     - ./deploy/settings_local.py:/config/settings_local.py:ro
+    - ./scripts:/scripts:ro
     - uploads:/app/uploads
   depends_on:
     db:
@@ -105,6 +106,7 @@ services:
     ports:
       - "80:80"
       - "443:443"
+      - "127.0.0.1:8080:8080"   # HTTP simple, poste de travail uniquement (voir Caddyfile)
     environment:
       DOMAIN: ${DOMAIN:-localhost}
     volumes:

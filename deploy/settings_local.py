@@ -50,6 +50,13 @@ PORT = 5000
 # Derrière Caddy : toutes les URL générées sont en https.
 PREFERRED_URL_SCHEME = "https"
 SPA_SERVER_NAME = "https://%s" % _env("DOMAIN", "localhost")
+# Utilisé dans les courriels d'invitation (fork Bloomberg : util.generate_invitation_email_*)
+SERVER_URL = SPA_SERVER_NAME
+IS_QA = False
+USER_MANUAL_LABEL = None
+USER_MANUAL_URL = None
+ADMIN_MANUAL_LABEL = None
+ADMIN_MANUAL_URL = None
 
 SECRET_KEY = _required("SECRET_KEY")
 ITSDANGEROUSKEY = _required("ITSDANGEROUSKEY")
@@ -96,7 +103,9 @@ BRAND = _env("BRAND", "U-QUAIL")
 TITLE = _env("TITLE", "U-QUAIL")
 DESCRIPTION = _env("DESCRIPTION", "Plateforme d'annotation par des experts")
 COPYRIGHT = _env("COPYRIGHT", "Université Grenoble Alpes")
-LOGO = "default_logo.svg"
+# Logo U-QUAIL (fichiers ajoutés dans static/img/, le thème n'est pas modifié) :
+# uquail-logo.svg pour la barre noire, uquail-logo-light.svg pour fond clair, uquail-icon.svg seul.
+LOGO = "uquail-logo.svg"
 FAVICON = "img/favicon/favicon.ico"
 CONTACT_EMAIL = _env("CONTACT_EMAIL", "")
 CONTACT_TWITTER = ""
@@ -104,14 +113,23 @@ TERMSOFUSE = "/help/terms-of-use"
 DATAUSE = "/help/privacy"
 ADMINS = _env_list("ADMINS")
 WEEKLY_ADMIN_REPORTS_EMAIL = ADMINS
+# Dépôt public de cette instance (mention AGPL dans le pied de page et la page "À propos").
+PROJECT_URL = _env("PROJECT_URL", "https://gitlab.com/ia4health.daisy/pybossa")
+# Page de confidentialité (lien du pied de page) : la page interne, pas un site tiers.
+PRIVACY_POLICY_PAGE = "/help/privacy"
+# Pas de formulaire de contact par projet.
+CONTACT_ENABLE = []
 
-DEFAULT_LOCALE = "fr"
-LOCALES = [("fr", "Français"), ("en", "English")]
+# Interface en anglais par défaut (textes U-QUAIL écrits en anglais, traduisibles) ;
+# chaque utilisateur peut choisir le français dans ses réglages.
+DEFAULT_LOCALE = _env("DEFAULT_LOCALE", "en")
+LOCALES = [("en", "English"), ("fr", "Français")]
 
 # Bandeau d'identification de l'environnement (fonction Bloomberg) : désactivé.
 SERVER_TYPE = ""
 DISPLAY_PLATFORM_IDENTIFIER = False
-NAVBAR_COLOR = ""
+# Fond de la barre de navigation : noir, comme la bannière AI4Health@DAISY (le logo est prévu pour).
+NAVBAR_COLOR = "#000000"
 
 # ---------------------------------------------------------------------------
 # Confidentialité et accès

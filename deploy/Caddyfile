@@ -6,6 +6,16 @@
 #   - DOMAIN=uquail.univ-....fr   : Caddy obtient et renouvelle seul un certificat
 #                                   Let's Encrypt. Le port 80 doit être ouvert pour cela.
 
+# Accès HTTP simple, réservé au poste de travail (compose ne le publie que sur 127.0.0.1:8080).
+# Sert aux outils qui refusent le certificat auto-signé (tests automatisés, captures d'écran).
+# Les cookies de session étant marqués "Secure", la connexion n'y fonctionne pas : consultation seulement.
+http://localhost:8080 {
+	reverse_proxy web:5000 {
+		# PyBossa (flask-talisman) force le HTTPS : on lui fait croire que la requête l'est.
+		header_up X-Forwarded-Proto https
+	}
+}
+
 {$DOMAIN} {
 	encode gzip
 
