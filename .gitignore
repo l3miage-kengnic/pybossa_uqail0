@@ -28,5 +28,5 @@ static/js/app.js.map
 data/
 doc/
 .env
-__pycache__/
+deploy/__pycache__/
 *.pyc
