@@ -102,17 +102,6 @@ perdue ne se rejoue pas.
 **Smoke test** : si le contrôle « API sans clé refusée » échoue, arrêter l'instance (`make down`) :
 elle serait ouverte au public.
 
-## 5. Comptes et rôles
-
-- **Administrateur** : vous. Crée les comptes, les projets, voit toutes les réponses.
-- **Sous-administrateur** : les étudiants (comptes de recette). Le fork réserve la création et la
-  modification des projets aux admins et sous-admins ; ce rôle leur permet de créer leurs projets
-  `sandbox-…`, d'y pousser tâches et interface d'annotation avec leur propre clé d'API, sans aucun
-  droit sur les projets de production. Il s'attribue dans l'administration des utilisateurs.
-- **Annotateur** : compte ordinaire, invité. Ne voit que ses tâches ; ne peut lire aucune réponse
-  d'un autre annotateur par l'API (vérifié, voir `doc/essai-octobre-resultats.md`).
-
-La clé d'API de chaque compte est visible sur sa page de profil.
 
 ## 6. Spécificités du fork Bloomberg à connaître
 
