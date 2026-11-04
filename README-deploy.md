@@ -8,6 +8,12 @@ dans ce dépôt : il est cloné à la construction de l'image, à un commit pré
 > `master` est en Python 2.7 et ne s'installe plus. Le commit utilisé est épinglé dans `.env`
 > (`PYBOSSA_REF`) : on ne suit jamais la branche mouvante.
 
+> **Pérennité.** Par défaut le serveur est cloné depuis GitHub (`bloomberg/pybossa`) : si ce dépôt
+> disparaît, l'image ne peut plus être reconstruite. `PYBOSSA_REPO` (dans `.env`) permet de cloner
+> depuis un **miroir non modifié** (ex. projet GitLab en *pull mirroring*). Ce n'est pas un fork de
+> développement : le code reste celui de l'amont, au même commit, et `make verify-upstream` le prouve
+> toujours puisqu'il compare le SHA. Avant `make upgrade REF=<sha>`, vérifier que le miroir est à jour.
+
 ## 1. Architecture
 
 Six conteneurs, décrits dans `compose.yaml` :

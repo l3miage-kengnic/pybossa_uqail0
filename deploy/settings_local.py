@@ -128,7 +128,7 @@ DATAUSE = "/help/privacy"
 ADMINS = _env_list("ADMINS")
 WEEKLY_ADMIN_REPORTS_EMAIL = ADMINS
 # Dépôt public de cette instance (mention AGPL dans le pied de page et la page "À propos").
-PROJECT_URL = _env("PROJECT_URL", "https://gitlab.com/ia4health.daisy/pybossa")
+PROJECT_URL = _env("PROJECT_URL", "https://gricad-gitlab.univ-grenoble-alpes.fr/ia4health.daisy/pybossa/pybossa-uquail-theme")
 # Page de confidentialité (lien du pied de page) : la page interne, pas un site tiers.
 PRIVACY_POLICY_PAGE = "/help/privacy"
 # Pas de formulaire de contact par projet.

@@ -16,6 +16,8 @@ x-pybossa: &pybossa
     context: .
     args:
       PYBOSSA_REF: ${PYBOSSA_REF}
+      # dépôt d'où cloner le serveur ; par défaut l'amont Bloomberg (voir .env.example)
+      PYBOSSA_REPO: ${PYBOSSA_REPO:-https://github.com/bloomberg/pybossa.git}
   env_file: .env
   environment:
     # lue par alembic/env.py du serveur (migrations de schéma)
