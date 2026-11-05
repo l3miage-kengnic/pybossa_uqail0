@@ -1,20 +1,20 @@
-# Raccourcis d'exploitation de l'instance PyBossa U-QUAIL (tutoriel GRICAD §9-11).
-# Sur Windows sans make : les commandes équivalentes sont dans README-deploy.md.
+# Operations shortcuts for the U-QUAIL PyBossa instance (GRICAD tutorial §9-11).
+# On Windows without make: the equivalent commands are in README-deploy.md.
 #
-#   make build     construit l'image (serveur épinglé à PYBOSSA_REF, thème de ce dépôt)
-#   make init      crée le schéma de la base — UNE SEULE FOIS dans la vie de l'instance
-#   make admin     crée le premier compte administrateur (interactif)
-#   make up        démarre tout (production : sans Mailpit)
-#   make up-local  démarre tout + Mailpit (poste de travail)
-#   make down      arrête tout (les données restent dans les volumes)
-#   make ps        état des conteneurs
-#   make logs      journaux en continu (Ctrl+C pour sortir)
-#   make shell     shell dans un conteneur web jetable
-#   make smoke     cinq contrôles de bon fonctionnement
-#   make backup    sauvegarde base + uploads (voir scripts/backup.sh)
-#   make restore DIR=backups/<horodatage>
-#   make upgrade REF=<sha>   change de version du serveur, reconstruit, migre le schéma
-#   make verify-upstream     prouve que le serveur installé est identique à l'amont
+#   make build     builds the image (server pinned to PYBOSSA_REF, theme from this repository)
+#   make init      creates the database schema — ONLY ONCE in the lifetime of the instance
+#   make admin     creates the first administrator account (interactive)
+#   make up        starts everything (production: without Mailpit)
+#   make up-local  starts everything + Mailpit (workstation)
+#   make down      stops everything (data stays in the volumes)
+#   make ps        container status
+#   make logs      follows the logs (Ctrl+C to exit)
+#   make shell     shell in a throwaway web container
+#   make smoke     five health checks
+#   make backup    backs up database + uploads (see scripts/backup.sh)
+#   make restore DIR=backups/<timestamp>
+#   make upgrade REF=<sha>   changes the server version, rebuilds, migrates the schema
+#   make verify-upstream     proves that the installed server is identical to upstream
 
 SHELL := /bin/bash
 COMPOSE := docker compose
@@ -32,7 +32,7 @@ init:
 	$(COMPOSE) run --rm web python cli.py db_create
 
 admin:
-	@read -p "Nom d'utilisateur (minuscules, sans espace) : " n; read -p "Nom complet : " f; read -p "E-mail : " e; \
+	@read -p "Username (lowercase, no spaces): " n; read -p "Full name: " f; read -p "Email: " e; \
 	$(COMPOSE) run --rm -e ADMIN_NAME="$$n" -e ADMIN_FULLNAME="$$f" -e ADMIN_EMAIL="$$e" web python /scripts/create-admin.py
 
 up:
@@ -60,12 +60,12 @@ backup:
 	./scripts/backup.sh
 
 restore:
-	@test -n "$(DIR)" || { echo "usage : make restore DIR=backups/<horodatage>"; exit 1; }
+	@test -n "$(DIR)" || { echo "usage: make restore DIR=backups/<timestamp>"; exit 1; }
 	./scripts/restore.sh "$(DIR)"
 
 upgrade:
-	@test -n "$(REF)" || { echo "usage : make upgrade REF=<sha du commit bloomberg/pybossa>"; exit 1; }
-	@echo "Mise à jour vers $(REF) : à faire HORS campagne, après une sauvegarde."
+	@test -n "$(REF)" || { echo "usage: make upgrade REF=<bloomberg/pybossa commit sha>"; exit 1; }
+	@echo "Upgrading to $(REF): do this OUTSIDE a campaign, after a backup."
 	./scripts/backup.sh
 	sed -i.bak 's/^PYBOSSA_REF=.*/PYBOSSA_REF=$(REF)/' $(ENV_FILE) && rm -f $(ENV_FILE).bak
 	$(COMPOSE) build
@@ -76,8 +76,8 @@ upgrade:
 verify-upstream:
 	@$(COMPOSE) run --rm -T --no-deps --entrypoint sh web -c '\
 	  ref=$$(cat /app/PYBOSSA_REF); head=$$(git -C /app rev-parse HEAD); \
-	  echo "commit installé : $$head"; echo "commit attendu  : $$ref"; \
-	  [ "$$ref" = "$$head" ] || { echo "ECHEC : commit différent"; exit 1; }; \
+	  echo "installed commit: $$head"; echo "expected commit : $$ref"; \
+	  [ "$$ref" = "$$head" ] || { echo "FAILED: different commit"; exit 1; }; \
 	  changes=$$(git -C /app status --porcelain --untracked-files=no -- . ":!pybossa/themes/default"); \
-	  if [ -n "$$changes" ]; then echo "ECHEC : fichiers du serveur modifiés :"; echo "$$changes"; exit 1; fi; \
-	  echo "OK : le serveur installé est identique à bloomberg/pybossa@$$ref (hors thème)."'
+	  if [ -n "$$changes" ]; then echo "FAILED: modified server files:"; echo "$$changes"; exit 1; fi; \
+	  echo "OK: the installed server is identical to bloomberg/pybossa@$$ref (theme excluded)."'

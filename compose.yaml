@@ -1,12 +1,12 @@
-# Composition PyBossa pour U-QUAIL.
+# PyBossa composition for U-QUAIL.
 #
-#   docker compose --profile local up -d     # poste de travail (ajoute Mailpit, faux serveur de courriel)
+#   docker compose --profile local up -d     # workstation (adds Mailpit, fake mail server)
 #   docker compose up -d                     # VM (production)
 #
-# Six services : db (PostgreSQL), redis, web (Flask/gunicorn), worker (RQ),
-# scheduler (RQ scheduler), proxy (Caddy, HTTPS). Les trois services PyBossa
-# partagent la même image et la même configuration (bloc x-pybossa).
-# Toutes les valeurs ${...} viennent de .env (copié depuis .env.example).
+# Six services: db (PostgreSQL), redis, web (Flask/gunicorn), worker (RQ),
+# scheduler (RQ scheduler), proxy (Caddy, HTTPS). The three PyBossa services
+# share the same image and the same configuration (x-pybossa block).
+# All ${...} values come from .env (copied from .env.example).
 
 name: uquail
 
@@ -16,11 +16,11 @@ x-pybossa: &pybossa
     context: .
     args:
       PYBOSSA_REF: ${PYBOSSA_REF}
-      # dépôt d'où cloner le serveur ; par défaut l'amont Bloomberg (voir .env.example)
+      # repository to clone the server from; defaults to the Bloomberg upstream (see .env.example)
       PYBOSSA_REPO: ${PYBOSSA_REPO:-https://github.com/bloomberg/pybossa.git}
   env_file: .env
   environment:
-    # lue par alembic/env.py du serveur (migrations de schéma)
+    # read by the server's alembic/env.py (schema migrations)
     PYB_SQLALCHEMY_DATABASE_URI: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db/${POSTGRES_DB}
     POSTGRES_HOST: db
     REDIS_HOST: redis
@@ -90,12 +90,12 @@ services:
       timeout: 5s
       retries: 5
       start_period: 60s
-    mem_limit: 1g        # 2 processus gunicorn ≈ 600 Mo au repos (doc GRICAD §2)
+    mem_limit: 1g        # 2 gunicorn processes ≈ 600 MB at rest (GRICAD doc §2)
 
   worker:
     <<: *pybossa
-    # Files RQ écoutées (noms vérifiés dans pybossa/core.py et pybossa/jobs.py).
-    # Sans ce service, l'application tourne mais aucun export ni courriel n'aboutit.
+    # RQ queues listened to (names checked in pybossa/core.py and pybossa/jobs.py).
+    # Without this service, the application runs but no export or email ever goes through.
     command:
       - python
       - app_context_rqworker.py
@@ -110,7 +110,7 @@ services:
 
   scheduler:
     <<: *pybossa
-    # Programme les travaux périodiques (statistiques, nettoyages).
+    # Schedules the periodic jobs (statistics, cleanups).
     command: ["python", "run_scheduler.py"]
     mem_limit: 256m
 
@@ -119,12 +119,12 @@ services:
     ports:
       - "80:80"
       - "443:443"
-      - "127.0.0.1:8080:8080"   # HTTP simple, poste de travail uniquement (voir Caddyfile)
+      - "127.0.0.1:8080:8080"   # plain HTTP, workstation only (see Caddyfile)
     environment:
       DOMAIN: ${DOMAIN:-localhost}
     volumes:
       - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy_data:/data        # certificats TLS (à conserver)
+      - caddy_data:/data        # TLS certificates (keep these)
       - caddy_config:/config
     depends_on:
       - web
@@ -132,8 +132,8 @@ services:
     mem_limit: 128m
     logging: *logging
 
-  # Faux serveur de courriel, uniquement sur le poste : les e-mails envoyés par
-  # PyBossa se lisent sur http://localhost:8025 au lieu de partir pour de vrai.
+  # Fake mail server, workstation only: emails sent by PyBossa
+  # can be read at http://localhost:8025 instead of actually being delivered.
   mailpit:
     image: axllent/mailpit:v1.21
     profiles: ["local"]

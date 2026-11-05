@@ -1,5 +1,5 @@
-# Ce qui n'entre jamais dans le contexte de construction de l'image.
-# (Le .git du thème est exclu : les sous-modules sont copiés comme de simples fichiers.)
+# What never goes into the image build context.
+# (The theme's .git is excluded: submodules are copied as plain files.)
 .git
 .github
 .gitignore
@@ -12,7 +12,7 @@ doc/
 *.docx
 *.md
 
-# artefacts locaux : régénérés dans l'image
+# local artifacts: regenerated in the image
 node_modules/
 static/src/node_modules/
 static/.webassets-cache/

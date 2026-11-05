@@ -1,23 +1,23 @@
 #!/usr/bin/env bash
-# Sauvegarde de l'instance PyBossa U-QUAIL : base PostgreSQL + fichiers envoyés (uploads).
+# Backup of the U-QUAIL PyBossa instance: PostgreSQL database + uploaded files (uploads).
 #
-# Usage (depuis le dossier du dépôt, conteneurs démarrés) :
-#   ./scripts/backup.sh                  # dans ./backups/<horodatage>/
-#   BACKUP_DIR=/mnt/sauvegardes ./scripts/backup.sh
+# Usage (from the repository folder, containers running):
+#   ./scripts/backup.sh                  # into ./backups/<timestamp>/
+#   BACKUP_DIR=/mnt/backups ./scripts/backup.sh
 #
-# Variables lues dans .env (ou l'environnement) :
-#   BACKUP_DIR            dossier de destination (défaut : ./backups)
-#   BACKUP_KEEP_DAYS      rotation : supprime les sauvegardes plus vieilles que N jours (défaut : 30)
-#   BACKUP_AGE_RECIPIENT  clé publique "age" : si définie, chaque fichier est chiffré (.age)
-#   BACKUP_REMOTE         destination rsync (ex. user@hote:/chemin/) : si définie, copie hors machine
+# Variables read from .env (or the environment):
+#   BACKUP_DIR            destination folder (default: ./backups)
+#   BACKUP_KEEP_DAYS      rotation: deletes backups older than N days (default: 30)
+#   BACKUP_AGE_RECIPIENT  "age" public key: if set, each file is encrypted (.age)
+#   BACKUP_REMOTE         rsync destination (e.g. user@host:/path/): if set, off-machine copy
 #
-# Une campagne perdue ne se rejoue pas : planifier ce script chaque nuit (voir scripts/cron.example)
-# et tester la restauration au moins une fois (scripts/restore.sh) avant la première campagne réelle.
+# A lost campaign cannot be rerun: schedule this script every night (see scripts/cron.example)
+# and test the restore at least once (scripts/restore.sh) before the first real campaign.
 set -euo pipefail
-export MSYS_NO_PATHCONV=1   # Git Bash (Windows) : ne pas convertir les chemins Linux passés aux conteneurs
+export MSYS_NO_PATHCONV=1   # Git Bash (Windows): do not convert Linux paths passed to containers
 
 cd "$(dirname "$0")/.."
-# Lecture de .env sans l'exécuter (des valeurs avec espaces y sont permises, pas en shell).
+# Read .env without executing it (values with spaces are allowed there, not in shell).
 envget() { [ -f .env ] && grep -E "^$1=" .env | tail -1 | cut -d= -f2- | sed -e 's/^"//' -e 's/"$//' || true; }
 for k in POSTGRES_USER POSTGRES_DB PYBOSSA_REF BACKUP_DIR BACKUP_KEEP_DAYS BACKUP_AGE_RECIPIENT BACKUP_REMOTE; do
   v="$(envget "$k")"; [ -n "$v" ] && [ -z "${!k:-}" ] && eval "$k=\"\$v\""
@@ -29,17 +29,17 @@ done
 stamp="$(date +%Y-%m-%d_%H%M%S)"
 dest="$BACKUP_DIR/$stamp"
 mkdir -p "$dest"
-echo "[$(date -Is)] sauvegarde -> $dest"
+echo "[$(date -Is)] backup -> $dest"
 
-# 1. Base de données (format "custom" de pg_dump : compressé, restaurable sélectivement).
+# 1. Database (pg_dump "custom" format: compressed, selectively restorable).
 docker compose exec -T db pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB" --format=custom > "$dest/db.dump"
-echo "  base : $(du -h "$dest/db.dump" | cut -f1)"
+echo "  database: $(du -h "$dest/db.dump" | cut -f1)"
 
-# 2. Fichiers envoyés (avatars, pièces jointes) : le volume "uploads" monté dans web.
+# 2. Uploaded files (avatars, attachments): the "uploads" volume mounted in web.
 docker compose exec -T web tar czf - -C /app uploads > "$dest/uploads.tgz"
-echo "  uploads : $(du -h "$dest/uploads.tgz" | cut -f1)"
+echo "  uploads: $(du -h "$dest/uploads.tgz" | cut -f1)"
 
-# 3. Version du serveur et empreinte de la configuration (pas de secret) pour savoir quoi restaurer.
+# 3. Server version and configuration fingerprint (no secrets) to know what to restore.
 {
   echo "date=$stamp"
   echo "pybossa_ref=${PYBOSSA_REF:-?}"
@@ -47,23 +47,23 @@ echo "  uploads : $(du -h "$dest/uploads.tgz" | cut -f1)"
   echo "settings_sha256=$(sha256sum deploy/settings_local.py | cut -d' ' -f1)"
 } > "$dest/MANIFEST"
 
-# 4. Chiffrement (optionnel mais recommandé pour toute copie hors machine).
+# 4. Encryption (optional but recommended for any off-machine copy).
 if [ -n "$BACKUP_AGE_RECIPIENT" ]; then
-  command -v age >/dev/null || { echo "age introuvable (apt install age)" >&2; exit 1; }
+  command -v age >/dev/null || { echo "age not found (apt install age)" >&2; exit 1; }
   for f in db.dump uploads.tgz; do
     age -r "$BACKUP_AGE_RECIPIENT" -o "$dest/$f.age" "$dest/$f" && rm -f "$dest/$f"
   done
-  echo "  chiffré avec age"
+  echo "  encrypted with age"
 else
-  echo "  AVERTISSEMENT : sauvegarde non chiffrée (BACKUP_AGE_RECIPIENT non défini)"
+  echo "  WARNING: unencrypted backup (BACKUP_AGE_RECIPIENT not set)"
 fi
 
-# 5. Copie hors machine (optionnelle).
+# 5. Off-machine copy (optional).
 if [ -n "$BACKUP_REMOTE" ]; then
   rsync -a --delete-after "$BACKUP_DIR/" "$BACKUP_REMOTE"
-  echo "  copié vers $BACKUP_REMOTE"
+  echo "  copied to $BACKUP_REMOTE"
 fi
 
-# 6. Rotation locale.
+# 6. Local rotation.
 find "$BACKUP_DIR" -mindepth 1 -maxdepth 1 -type d -mtime "+$BACKUP_KEEP_DAYS" -exec rm -rf {} + 2>/dev/null || true
-echo "[$(date -Is)] terminé"
+echo "[$(date -Is)] done"

@@ -1,7 +1,7 @@
 #!/bin/sh
-# Point d'entrée commun aux conteneurs PyBossa (web, worker, scheduler, commandes ponctuelles).
-# Rôle unique : attendre que PostgreSQL et Redis répondent, puis lancer la commande demandée.
-# Aucune logique applicative ici : tout le reste appartient à PyBossa lui-même.
+# Common entry point for the PyBossa containers (web, worker, scheduler, one-off commands).
+# Single role: wait until PostgreSQL and Redis respond, then run the requested command.
+# No application logic here: everything else belongs to PyBossa itself.
 set -eu
 
 : "${POSTGRES_HOST:=db}"
@@ -11,15 +11,15 @@ set -eu
 : "${WAIT_TIMEOUT:=90}"
 
 wait_for() {
-    # $1 = libellé, $2 = commande de test (évaluée par sh)
+    # $1 = label, $2 = test command (evaluated by sh)
     i=0
     until eval "$2" >/dev/null 2>&1; do
         i=$((i + 1))
         if [ "$i" -ge "$WAIT_TIMEOUT" ]; then
-            echo "entrypoint: $1 injoignable après ${WAIT_TIMEOUT} s, abandon." >&2
+            echo "entrypoint: $1 unreachable after ${WAIT_TIMEOUT} s, giving up." >&2
             exit 1
         fi
-        [ "$i" -eq 1 ] && echo "entrypoint: attente de $1..."
+        [ "$i" -eq 1 ] && echo "entrypoint: waiting for $1..."
         sleep 1
     done
 }

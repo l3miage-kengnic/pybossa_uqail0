@@ -1,25 +1,25 @@
-# Proxy inverse Caddy : termine le HTTPS et transmet au service "web" (gunicorn:5000).
+# Caddy reverse proxy: terminates HTTPS and forwards to the "web" service (gunicorn:5000).
 #
-# DOMAIN vient de .env (via compose.yaml) :
-#   - DOMAIN=localhost            : Caddy émet un certificat auto-signé (avertissement
-#                                   du navigateur, normal sur le poste de travail) ;
-#   - DOMAIN=uquail.univ-....fr   : Caddy obtient et renouvelle seul un certificat
-#                                   Let's Encrypt. Le port 80 doit être ouvert pour cela.
+# DOMAIN comes from .env (via compose.yaml):
+#   - DOMAIN=localhost            : Caddy issues a self-signed certificate (browser
+#                                   warning, expected on the workstation);
+#   - DOMAIN=uquail.univ-....fr   : Caddy obtains and renews a Let's Encrypt certificate
+#                                   on its own. Port 80 must be open for this.
 
-# Accès HTTP simple, réservé au poste de travail (compose ne le publie que sur 127.0.0.1:8080).
-# Sert aux outils qui refusent le certificat auto-signé (tests automatisés, captures d'écran).
-# Connexion possible (DOMAIN=localhost lève l'obligation HTTPS) ; jamais exposé hors de la machine.
+# Plain HTTP access, reserved for the workstation (compose only publishes it on 127.0.0.1:8080).
+# Used by tools that reject the self-signed certificate (automated tests, screenshots).
+# Login is possible (DOMAIN=localhost lifts the HTTPS requirement); never exposed outside the machine.
 http://localhost:8080 {
-	# Pas d'en-tête X-Forwarded-Proto forcé : deploy/settings_local.py lève l'obligation HTTPS
-	# quand DOMAIN=localhost, et annoncer "https" ferait échouer la protection CSRF des formulaires.
+	# No forced X-Forwarded-Proto header: deploy/settings_local.py lifts the HTTPS requirement
+	# when DOMAIN=localhost, and announcing "https" would make the forms' CSRF protection fail.
 	reverse_proxy web:5000
 }
 
 {$DOMAIN} {
 	encode gzip
 
-	# Inscription : réservée aux administrateurs par le serveur lui-même (fork Bloomberg),
-	# rien à bloquer ici.
+	# Sign-up: restricted to administrators by the server itself (Bloomberg fork),
+	# nothing to block here.
 
 	reverse_proxy web:5000
 
